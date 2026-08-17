@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>BurgerTime Arcade 2D</title>
+  <meta name="description" content="Juego arcade clásico 2D de BurgerTime jugable en el navegador. Arma 2 hamburguesas gigantes esquivando a la salchicha." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #0d0d17;
+      --arcade-frame: #1e1e2f;
+      --accent-yellow: #f8cc1b;
+      --accent-red: #e74c3c;
+      --accent-green: #2ecc71;
+      --accent-blue: #3498db;
+      --text-white: #ffffff;
+      --text-gray: #a0a0b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-white);
+      font-family: 'Press Start 2P', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      padding: 12px;
+    }
+
+    /* Contenedor Arcade */
+    .game-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--arcade-frame);
+      padding: 16px;
+      border-radius: 18px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(248, 204, 27, 0.15);
+      border: 3px solid #2f2f48;
+      max-width: 100%;
+    }
+
+    .arcade-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 0 8px;
+    }
+
+    .marquee-title {
+      font-size: 16px;
+      color: var(--accent-yellow);
+      text-shadow: 2px 2px #000, 0 0 10px rgba(248, 204, 27, 0.6);
+      letter-spacing: 1px;
+    }
+
+    .audio-toggle-btn {
+      background: #2b2b3d;
+      border: 2px solid #4a4a68;
+      color: var(--text-white);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 9px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .audio-toggle-btn:hover {
+      background: #3c3c54;
+      border-color: var(--accent-yellow);
+    }
+
+    /* Canvas Screen */
+    .canvas-container {
+      position: relative;
+      border: 4px solid #111118;
+      border-radius: 8px;
+      background: #000;
+      overflow: hidden;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9);
+      max-width: 100%;
+    }
+
+    canvas {
+      display: block;
+      width: 800px;
+      height: 640px;
+      max-width: 100%;
+      height: auto;
+      aspect-ratio: 800 / 640;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* Controles Táctiles para Móviles */
+    .mobile-controls {
+      display: none;
+      width: 100%;
+      max-width: 800px;
+      margin-top: 14px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 10px;
+    }
+
+    @media (max-width: 860px) {
+      .mobile-controls {
+        display: flex;
+      }
+      .marquee-title {
+        font-size: 12px;
+      }
+    }
+
+    .d-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 50px);
+      grid-template-rows: repeat(3, 50px);
+      gap: 5px;
+    }
+
+    .ctrl-btn {
+      background: #252538;
+      border: 2px solid #444460;
+      color: #fff;
+      font-size: 16px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 0 #151522;
+      font-family: inherit;
+    }
+
+    .ctrl-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #151522;
+      background: #383854;
+    }
+
+    .btn-up    { grid-column: 2; grid-row: 1; }
+    .btn-left  { grid-column: 1; grid-row: 2; }
+    .btn-center{ grid-column: 2; grid-row: 2; opacity: 0.2; pointer-events: none; }
+    .btn-right { grid-column: 3; grid-row: 2; }
+    .btn-down  { grid-column: 2; grid-row: 3; }
+
+    .action-group {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .btn-action-salt {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #e67e22;
+      border: 3px solid #f39c12;
+      color: #fff;
+      font-family: inherit;
+      font-size: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      box-shadow: 0 6px 0 #935116;
+      cursor: pointer;
+    }
+
+    .btn-action-salt:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #935116;
+      background: #d35400;
+    }
+
+    /* Footer info */
+    .arcade-footer {
+      margin-top: 10px;
+      font-size: 9px;
+      color: var(--text-gray);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .arcade-footer kbd {
+      background: #252538;
+      border: 1px solid #444460;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--accent-yellow);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-wrapper">
+    <div class="arcade-header">
+      <div class="marquee-title">★ BURGERTIME ARCADE ★</div>
+      <button class="audio-toggle-btn" id="audioToggleBtn" title="Activar/Silenciar Sonido">🔊 SONIDO</button>
+    </div>
+
+    <div class="canvas-container">
+      <canvas id="gameCanvas" width="800" height="640"></canvas>
+    </div>
+
+    <!-- Controles en pantalla para celulares/tablets -->
+    <div class="mobile-controls">
+      <div class="d-pad">
+        <button class="ctrl-btn btn-up" id="btnUp">▲</button>
+        <button class="ctrl-btn btn-left" id="btnLeft">◀</button>
+        <div class="ctrl-btn btn-center"></div>
+        <button class="ctrl-btn btn-right" id="btnRight">▶</button>
+        <button class="ctrl-btn btn-down" id="btnDown">▼</button>
+      </div>
+
+      <div class="action-group">
+        <button class="btn-action-salt" id="btnSalt">
+          <span>SAL</span>
+          <span style="font-size: 8px;">🧂</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="arcade-footer">
+      Controles: <kbd>FLECHAS</kbd> o <kbd>WASD</kbd> Mover | <kbd>ESPACIO</kbd> Lanzar Sal | <kbd>1</kbd>/<kbd>2</kbd> Seleccionar | <kbd>R</kbd> Reiniciar
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
