@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>BurgerTime Arcade 2D</title>
-  <meta name="description" content="Juego arcade clásico 2D de BurgerTime. Arma las 2 hamburguesas gigantes con sus 7 ingredientes completos esquivando a la salchicha." />
+  <meta name="description" content="Juego arcade clásico 2D de BurgerTime fiel al diseño arcade original con 2 hamburguesas completas de 7 ingredientes." />
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,13 +12,14 @@
 
   <style>
     :root {
-      --bg-color: #08090f;
-      --arcade-frame: #161626;
+      --bg-color: #050508;
+      --arcade-frame: #0e0e18;
       --accent-yellow: #f8cc1b;
-      --accent-red: #e74c3c;
-      --accent-green: #2ecc71;
+      --accent-red: #ff2222;
+      --accent-green: #22ff44;
+      --accent-cyan: #00f0ff;
       --text-white: #ffffff;
-      --text-gray: #a0a0b8;
+      --text-gray: #8888a0;
     }
 
     * {
@@ -40,20 +41,20 @@
       align-items: center;
       justify-content: center;
       overflow-x: hidden;
-      padding: 8px;
+      padding: 6px;
     }
 
-    /* Gabinete Arcade */
+    /* Gabinete Arcade Retro */
     .game-wrapper {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       background: var(--arcade-frame);
-      padding: 14px;
-      border-radius: 16px;
-      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.85), 0 0 24px rgba(248, 204, 27, 0.12);
-      border: 3px solid #28283e;
+      padding: 12px;
+      border-radius: 14px;
+      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.95), 0 0 20px rgba(0, 240, 255, 0.15);
+      border: 3px solid #1a1a2e;
       max-width: 100%;
     }
 
@@ -62,23 +63,23 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
-      padding: 0 6px;
+      margin-bottom: 8px;
+      padding: 0 4px;
     }
 
     .marquee-title {
-      font-size: 15px;
+      font-size: 14px;
       color: var(--accent-yellow);
-      text-shadow: 2px 2px #000, 0 0 8px rgba(248, 204, 27, 0.5);
+      text-shadow: 2px 2px #000, 0 0 8px rgba(248, 204, 27, 0.6);
       letter-spacing: 1px;
     }
 
     .audio-toggle-btn {
-      background: #232338;
-      border: 2px solid #424264;
+      background: #181828;
+      border: 2px solid #333350;
       color: var(--text-white);
-      padding: 6px 12px;
-      border-radius: 6px;
+      padding: 5px 10px;
+      border-radius: 5px;
       font-family: inherit;
       font-size: 9px;
       cursor: pointer;
@@ -86,41 +87,41 @@
     }
 
     .audio-toggle-btn:hover {
-      background: #363654;
-      border-color: var(--accent-yellow);
+      background: #25253e;
+      border-color: var(--accent-cyan);
     }
 
-    /* Contenedor Canvas */
+    /* Contenedor Canvas Pantalla CRT Arcade */
     .canvas-container {
       position: relative;
-      border: 3px solid #101018;
-      border-radius: 8px;
+      border: 3px solid #000000;
+      border-radius: 6px;
       background: #000;
       overflow: hidden;
-      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.95);
+      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.98), 0 0 12px rgba(0, 240, 255, 0.08);
       max-width: 100%;
     }
 
     canvas {
       display: block;
       width: 800px;
-      height: 700px;
+      height: 720px;
       max-width: 100%;
       height: auto;
-      aspect-ratio: 800 / 700;
+      aspect-ratio: 800 / 720;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
     }
 
-    /* Controles Táctiles para Dispositivos Móviles */
+    /* Controles Táctiles para Móviles */
     .mobile-controls {
       display: none;
       width: 100%;
       max-width: 800px;
-      margin-top: 12px;
+      margin-top: 10px;
       justify-content: space-between;
       align-items: center;
-      padding: 4px 8px;
+      padding: 4px 6px;
     }
 
     @media (max-width: 860px) {
@@ -128,22 +129,22 @@
         display: flex;
       }
       .marquee-title {
-        font-size: 11px;
+        font-size: 10px;
       }
     }
 
     .d-pad {
       display: grid;
-      grid-template-columns: repeat(3, 48px);
-      grid-template-rows: repeat(3, 48px);
+      grid-template-columns: repeat(3, 46px);
+      grid-template-rows: repeat(3, 46px);
       gap: 4px;
     }
 
     .ctrl-btn {
-      background: #222236;
-      border: 2px solid #3c3c58;
+      background: #18182a;
+      border: 2px solid #2e2e4a;
       color: #fff;
-      font-size: 15px;
+      font-size: 14px;
       border-radius: 8px;
       display: flex;
       align-items: center;
@@ -151,19 +152,19 @@
       cursor: pointer;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
-      box-shadow: 0 4px 0 #12121e;
+      box-shadow: 0 3px 0 #0a0a14;
       font-family: inherit;
     }
 
     .ctrl-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #12121e;
-      background: #34344e;
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #0a0a14;
+      background: #2b2b46;
     }
 
     .btn-up    { grid-column: 2; grid-row: 1; }
     .btn-left  { grid-column: 1; grid-row: 2; }
-    .btn-center{ grid-column: 2; grid-row: 2; opacity: 0.15; pointer-events: none; }
+    .btn-center{ grid-column: 2; grid-row: 2; opacity: 0.1; pointer-events: none; }
     .btn-right { grid-column: 3; grid-row: 2; }
     .btn-down  { grid-column: 2; grid-row: 3; }
 
@@ -174,42 +175,42 @@
     }
 
     .btn-action-salt {
-      width: 76px;
-      height: 76px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
-      background: #e67e22;
-      border: 3px solid #f39c12;
+      background: #0088b3;
+      border: 3px solid var(--accent-cyan);
       color: #fff;
       font-family: inherit;
-      font-size: 10px;
+      font-size: 9px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 3px;
-      box-shadow: 0 5px 0 #935116;
+      box-shadow: 0 4px 0 #004d66;
       cursor: pointer;
     }
 
     .btn-action-salt:active {
-      transform: translateY(3px);
-      box-shadow: 0 2px 0 #935116;
-      background: #d35400;
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #004d66;
+      background: #00a3d9;
     }
 
     .arcade-footer {
-      margin-top: 10px;
-      font-size: 8.5px;
+      margin-top: 8px;
+      font-size: 8px;
       color: var(--text-gray);
       text-align: center;
-      line-height: 1.5;
+      line-height: 1.4;
     }
 
     .arcade-footer kbd {
-      background: #222236;
-      border: 1px solid #3c3c58;
-      padding: 2px 5px;
-      border-radius: 4px;
+      background: #18182a;
+      border: 1px solid #2e2e4a;
+      padding: 2px 4px;
+      border-radius: 3px;
       color: var(--accent-yellow);
     }
   </style>
@@ -218,12 +219,12 @@
 
   <div class="game-wrapper">
     <div class="arcade-header">
-      <div class="marquee-title">★ BURGERTIME ARCADE ★</div>
+      <div class="marquee-title">★ BURGERTIME ARCADE 1982 ★</div>
       <button class="audio-toggle-btn" id="audioToggleBtn" title="Activar/Silenciar Sonido">🔊 SONIDO</button>
     </div>
 
     <div class="canvas-container">
-      <canvas id="gameCanvas" width="800" height="700"></canvas>
+      <canvas id="gameCanvas" width="800" height="720"></canvas>
     </div>
 
     <!-- Controles Táctiles para Móviles -->
@@ -245,7 +246,7 @@
     </div>
 
     <div class="arcade-footer">
-      <kbd>FLECHAS</kbd> o <kbd>WASD</kbd> Moverse & Subir/Bajar Escaleras | <kbd>ESPACIO</kbd> Lanzar Sal | <kbd>1</kbd>/<kbd>2</kbd> Chef | <kbd>R</kbd> Reiniciar
+      <kbd>FLECHAS</kbd> o <kbd>WASD</kbd> Mover / Escaleras | <kbd>ESPACIO</kbd> Lanzar Sal | <kbd>1</kbd>/<kbd>2</kbd> Chef | <kbd>R</kbd> Reiniciar
     </div>
   </div>
 
