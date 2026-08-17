@@ -1,19 +1,18 @@
 /**
  * BurgerTime Arcade 2D - Motor Web Canvas
- * Estructura de mapa basada en el clásico BurgerTime de arcade, adaptada para 2 hamburguesas completas de 7 capas.
+ * Mapa con hamburguesas enmarcadas entre escaleras y platos ubicados en la base inferior para lucir el armado completo.
  */
 
 // =============================================================================
 // 1. CONSTANTES Y CONFIGURACIÓN
 // =============================================================================
 const CANVAS_W = 800;
-const CANVAS_H = 720;
+const CANVAS_H = 760;
 
 // Paleta Retro Arcade Auténtica
 const C_BG = "#000000";
 const C_PLATFORM_CYAN = "#00f0ff";
 const C_PLATFORM_DARK = "#003b52";
-const C_PLATFORM_ACCENT = "#0088b3";
 const C_LADDER_RAIL = "#00d0f0";
 const C_LADDER_RUNG = "#d8d8d8";
 const C_TEXT_RED = "#ff2222";
@@ -96,10 +95,6 @@ class SoundSystem {
 
   hit() {
     this.playTone(100, "sawtooth", 0.4, 0.25);
-  }
-
-  score() {
-    this.playTone(880, "sine", 0.08, 0.08);
   }
 
   win() {
@@ -196,117 +191,129 @@ Sprites.loadAll();
 
 
 // =============================================================================
-// 4. MAPA DE NIVELES (ESTRUCTURA BURGERTIME ARCADE)
+// 4. MAPA DE NIVELES (HAMBURGUESAS ENMARCADAS ENTRE ESCALERAS)
 // =============================================================================
 class LevelStructure {
   constructor() {
-    // 8 Pisos (7 pisos superiores + piso 8 de platos)
+    // 7 pisos para los 7 ingredientes + piso 7 de caminata inferior + plato base en Y=700
     this.floors = [
-      { y: 105, name: "Piso 1" },
-      { y: 180, name: "Piso 2" },
-      { y: 255, name: "Piso 3" },
-      { y: 330, name: "Piso 4" },
-      { y: 405, name: "Piso 5" },
-      { y: 480, name: "Piso 6" },
-      { y: 555, name: "Piso 7" },
-      { y: 630, name: "Piso 8 (Platos)" },
+      { y: 95,  name: "Piso 1" },
+      { y: 165, name: "Piso 2" },
+      { y: 235, name: "Piso 3" },
+      { y: 305, name: "Piso 4" },
+      { y: 375, name: "Piso 5" },
+      { y: 445, name: "Piso 6" },
+      { y: 515, name: "Piso 7" },
+      { y: 585, name: "Piso 8 (Plataforma Inferior)" },
     ];
 
-    this.floorThickness = 8;
+    this.plateY = 700; // Platos más abajo con amplio espacio para la hamburguesa armada
 
-    // Posición X de las 2 Hamburguesas
-    this.burger1X = 140; // Columna Izquierda
-    this.burger2X = 520; // Columna Derecha
-    this.burgerWidth = 140;
+    // Ancho y posiciones de las hamburguesas (Enmarcadas perfectamente entre escaleras)
+    this.burgerWidth = 150;
+    // Hamburguesa 1 (Izquierda): entre escalera X=76..102 y X=268..294
+    this.burger1X = 110; 
+    // Hamburguesa 2 (Derecha): entre escalera X=506..532 y X=698..724
+    this.burger2X = 540;
 
-    // Secciones de Plataformas horizontales (Walkways) al estilo del mapa arcade
-    // { floorIdx, x1, x2 }
+    // Pasarelas / Plataformas estilo Arcade
     this.platforms = [
-      // Piso 0 (Y=105)
-      { floorIdx: 0, x1: 30, x2: 770 },
+      // Piso 0 (Y=95)
+      { floorIdx: 0, x1: 20, x2: 780 },
 
-      // Piso 1 (Y=180)
-      { floorIdx: 1, x1: 30,  x2: 320 },
-      { floorIdx: 1, x1: 350, x2: 450 },
-      { floorIdx: 1, x1: 480, x2: 770 },
+      // Piso 1 (Y=165)
+      { floorIdx: 1, x1: 20,  x2: 320 },
+      { floorIdx: 1, x1: 360, x2: 440 },
+      { floorIdx: 1, x1: 480, x2: 780 },
 
-      // Piso 2 (Y=255)
-      { floorIdx: 2, x1: 30,  x2: 240 },
+      // Piso 2 (Y=235)
+      { floorIdx: 2, x1: 20,  x2: 230 },
       { floorIdx: 2, x1: 270, x2: 530 },
-      { floorIdx: 2, x1: 560, x2: 770 },
+      { floorIdx: 2, x1: 570, x2: 780 },
 
-      // Piso 3 (Y=330)
-      { floorIdx: 3, x1: 30,  x2: 320 },
-      { floorIdx: 3, x1: 350, x2: 450 },
-      { floorIdx: 3, x1: 480, x2: 770 },
+      // Piso 3 (Y=305)
+      { floorIdx: 3, x1: 20,  x2: 320 },
+      { floorIdx: 3, x1: 360, x2: 440 },
+      { floorIdx: 3, x1: 480, x2: 780 },
 
-      // Piso 4 (Y=405)
-      { floorIdx: 4, x1: 30,  x2: 240 },
+      // Piso 4 (Y=375)
+      { floorIdx: 4, x1: 20,  x2: 230 },
       { floorIdx: 4, x1: 270, x2: 530 },
-      { floorIdx: 4, x1: 560, x2: 770 },
+      { floorIdx: 4, x1: 570, x2: 780 },
 
-      // Piso 5 (Y=480)
-      { floorIdx: 5, x1: 30,  x2: 320 },
-      { floorIdx: 5, x1: 350, x2: 450 },
-      { floorIdx: 5, x1: 480, x2: 770 },
+      // Piso 5 (Y=445)
+      { floorIdx: 5, x1: 20,  x2: 320 },
+      { floorIdx: 5, x1: 360, x2: 440 },
+      { floorIdx: 5, x1: 480, x2: 780 },
 
-      // Piso 6 (Y=555)
-      { floorIdx: 6, x1: 30,  x2: 770 },
+      // Piso 6 (Y=515)
+      { floorIdx: 6, x1: 20,  x2: 780 },
 
-      // Piso 7 (Base Y=630)
-      { floorIdx: 7, x1: 30,  x2: 770 },
+      // Piso 7 (Y=585 - Último piso caminable antes del plato)
+      { floorIdx: 7, x1: 20,  x2: 780 },
     ];
 
-    // Escaleras verticales conectando los pisos (diseño auténtico del mapa arcade)
+    // Escaleras: Enmarcan exactamente cada columna de hamburguesa
+    // Columna Burger 1: Escalera izquierda en X=76, Escalera derecha en X=268
+    // Columna Burger 2: Escalera izquierda en X=506, Escalera derecha en X=698
+    // Escalera Central en X=387, Escaleras Exteriores en X=24 y X=750
     this.ladders = [
       // Piso 0 a 1
-      { x: 50,  topY: 105, bottomY: 180, w: 26 },
-      { x: 300, topY: 105, bottomY: 180, w: 26 },
-      { x: 390, topY: 105, bottomY: 180, w: 26 },
-      { x: 490, topY: 105, bottomY: 180, w: 26 },
-      { x: 730, topY: 105, bottomY: 180, w: 26 },
+      { x: 24,  topY: 95, bottomY: 165, w: 26 },
+      { x: 76,  topY: 95, bottomY: 165, w: 26 },
+      { x: 268, topY: 95, bottomY: 165, w: 26 },
+      { x: 387, topY: 95, bottomY: 165, w: 26 },
+      { x: 506, topY: 95, bottomY: 165, w: 26 },
+      { x: 698, topY: 95, bottomY: 165, w: 26 },
+      { x: 750, topY: 95, bottomY: 165, w: 26 },
 
       // Piso 1 a 2
-      { x: 100, topY: 180, bottomY: 255, w: 26 },
-      { x: 210, topY: 180, bottomY: 255, w: 26 },
-      { x: 390, topY: 180, bottomY: 255, w: 26 },
-      { x: 590, topY: 180, bottomY: 255, w: 26 },
-      { x: 690, topY: 180, bottomY: 255, w: 26 },
+      { x: 76,  topY: 165, bottomY: 235, w: 26 },
+      { x: 268, topY: 165, bottomY: 235, w: 26 },
+      { x: 387, topY: 165, bottomY: 235, w: 26 },
+      { x: 506, topY: 165, bottomY: 235, w: 26 },
+      { x: 698, topY: 165, bottomY: 235, w: 26 },
 
       // Piso 2 a 3
-      { x: 50,  topY: 255, bottomY: 330, w: 26 },
-      { x: 300, topY: 255, bottomY: 330, w: 26 },
-      { x: 390, topY: 255, bottomY: 330, w: 26 },
-      { x: 490, topY: 255, bottomY: 330, w: 26 },
-      { x: 730, topY: 255, bottomY: 330, w: 26 },
+      { x: 24,  topY: 235, bottomY: 305, w: 26 },
+      { x: 76,  topY: 235, bottomY: 305, w: 26 },
+      { x: 268, topY: 235, bottomY: 305, w: 26 },
+      { x: 387, topY: 235, bottomY: 305, w: 26 },
+      { x: 506, topY: 235, bottomY: 305, w: 26 },
+      { x: 698, topY: 235, bottomY: 305, w: 26 },
+      { x: 750, topY: 235, bottomY: 305, w: 26 },
 
       // Piso 3 a 4
-      { x: 100, topY: 330, bottomY: 405, w: 26 },
-      { x: 210, topY: 330, bottomY: 405, w: 26 },
-      { x: 390, topY: 330, bottomY: 405, w: 26 },
-      { x: 590, topY: 330, bottomY: 405, w: 26 },
-      { x: 690, topY: 330, bottomY: 405, w: 26 },
+      { x: 76,  topY: 305, bottomY: 375, w: 26 },
+      { x: 268, topY: 305, bottomY: 375, w: 26 },
+      { x: 387, topY: 305, bottomY: 375, w: 26 },
+      { x: 506, topY: 305, bottomY: 375, w: 26 },
+      { x: 698, topY: 305, bottomY: 375, w: 26 },
 
       // Piso 4 a 5
-      { x: 50,  topY: 405, bottomY: 480, w: 26 },
-      { x: 300, topY: 405, bottomY: 480, w: 26 },
-      { x: 390, topY: 405, bottomY: 480, w: 26 },
-      { x: 490, topY: 405, bottomY: 480, w: 26 },
-      { x: 730, topY: 405, bottomY: 480, w: 26 },
+      { x: 24,  topY: 375, bottomY: 445, w: 26 },
+      { x: 76,  topY: 375, bottomY: 445, w: 26 },
+      { x: 268, topY: 375, bottomY: 445, w: 26 },
+      { x: 387, topY: 375, bottomY: 445, w: 26 },
+      { x: 506, topY: 375, bottomY: 445, w: 26 },
+      { x: 698, topY: 375, bottomY: 445, w: 26 },
+      { x: 750, topY: 375, bottomY: 445, w: 26 },
 
       // Piso 5 a 6
-      { x: 100, topY: 480, bottomY: 555, w: 26 },
-      { x: 210, topY: 480, bottomY: 555, w: 26 },
-      { x: 390, topY: 480, bottomY: 555, w: 26 },
-      { x: 590, topY: 480, bottomY: 555, w: 26 },
-      { x: 690, topY: 480, bottomY: 555, w: 26 },
+      { x: 76,  topY: 445, bottomY: 515, w: 26 },
+      { x: 268, topY: 445, bottomY: 515, w: 26 },
+      { x: 387, topY: 445, bottomY: 515, w: 26 },
+      { x: 506, topY: 445, bottomY: 515, w: 26 },
+      { x: 698, topY: 445, bottomY: 515, w: 26 },
 
-      // Piso 6 a 7 (Hacia los platos base)
-      { x: 50,  topY: 555, bottomY: 630, w: 26 },
-      { x: 300, topY: 555, bottomY: 630, w: 26 },
-      { x: 390, topY: 555, bottomY: 630, w: 26 },
-      { x: 490, topY: 555, bottomY: 630, w: 26 },
-      { x: 730, topY: 555, bottomY: 630, w: 26 },
+      // Piso 6 a 7
+      { x: 24,  topY: 515, bottomY: 585, w: 26 },
+      { x: 76,  topY: 515, bottomY: 585, w: 26 },
+      { x: 268, topY: 515, bottomY: 585, w: 26 },
+      { x: 387, topY: 515, bottomY: 585, w: 26 },
+      { x: 506, topY: 515, bottomY: 585, w: 26 },
+      { x: 698, topY: 515, bottomY: 585, w: 26 },
+      { x: 750, topY: 515, bottomY: 585, w: 26 },
     ];
   }
 
@@ -343,72 +350,62 @@ class LevelStructure {
   }
 
   draw(ctx) {
-    // Fondo Negro Arcade
     ctx.fillStyle = C_BG;
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
-    // 1. Escaleras (Estilo auténtico con peldaños grises densos y rieles cyan)
+    // 1. Escaleras (Peldaños densos nítidos con rieles cyan)
     for (const lad of this.ladders) {
       const lx = lad.x;
       const lw = lad.w;
       const top = lad.topY;
       const btm = lad.bottomY;
 
-      // Rieles laterales cyan
       ctx.fillStyle = C_LADDER_RAIL;
       ctx.fillRect(lx, top, 3, btm - top);
       ctx.fillRect(lx + lw - 3, top, 3, btm - top);
 
-      // Peldaños grises horizontales
       ctx.fillStyle = C_LADDER_RUNG;
       for (let ry = top + 4; ry < btm; ry += 6) {
         ctx.fillRect(lx + 2, ry, lw - 4, 2);
       }
     }
 
-    // 2. Plataformas (Vigas horizontales Cyan Brillante estilo Arcade BurgerTime)
+    // 2. Pasarelas / Vigas Cyan
     for (const p of this.platforms) {
       const fy = this.floors[p.floorIdx].y;
       const pw = p.x2 - p.x1;
 
-      // Cuerpo de la viga
       ctx.fillStyle = C_PLATFORM_DARK;
       ctx.fillRect(p.x1, fy, pw, 6);
 
-      // Riel superior cyan brillante
       ctx.fillStyle = C_PLATFORM_CYAN;
       ctx.fillRect(p.x1, fy, pw, 2);
-
-      // Borde inferior cyan
       ctx.fillRect(p.x1, fy + 4, pw, 2);
 
-      // Remaches verticales intermedios
-      ctx.fillStyle = C_PLATFORM_CYAN;
       for (let rx = p.x1 + 8; rx < p.x2; rx += 16) {
         ctx.fillRect(rx, fy + 2, 2, 2);
       }
     }
 
-    // 3. Platos de Servido en la Base (Y=630)
-    const plateY = 630 + 4;
+    // 3. Platos de Servido en la base inferior (Y = plateY)
     for (const bx of [this.burger1X, this.burger2X]) {
-      const pw = this.burgerWidth;
-      const px = bx - 10;
+      const pw = this.burgerWidth + 16;
+      const px = bx - 8;
 
       // Sombra
-      ctx.fillStyle = "rgba(255,255,255,0.1)";
+      ctx.fillStyle = "rgba(0, 240, 255, 0.15)";
       ctx.beginPath();
-      ctx.ellipse(px + pw / 2 + 10, plateY + 6, pw / 2 + 16, 8, 0, 0, Math.PI * 2);
+      ctx.ellipse(px + pw / 2, this.plateY + 6, pw / 2 + 12, 8, 0, 0, Math.PI * 2);
       ctx.fill();
 
       // Plato Cerámica Retro Blanca
       ctx.fillStyle = "#ffffff";
       ctx.beginPath();
-      ctx.ellipse(px + pw / 2 + 10, plateY, pw / 2 + 14, 6, 0, 0, Math.PI * 2);
+      ctx.ellipse(px + pw / 2, this.plateY, pw / 2 + 10, 6, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.strokeStyle = "#00d0f0";
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = C_PLATFORM_CYAN;
+      ctx.lineWidth = 2.5;
       ctx.stroke();
     }
   }
@@ -460,13 +457,13 @@ class SaltCloud {
 // 6. PIEZA DE HAMBURGUESA INDIVIDUAL (7 CAPAS)
 // =============================================================================
 const LAYER_CONFIGS = {
-  pan_superior: { name: "Pan Superior", sprite: "pan_superior", h: 36, overlap: 10, pts: 100 },
-  cebolla:      { name: "Cebolla",      sprite: "cebolla",      h: 26, overlap: 12, pts: 80  },
-  bacon:        { name: "Bacon",        sprite: "bacon",        h: 26, overlap: 10, pts: 80  },
-  queso:        { name: "Queso",        sprite: "queso",        h: 22, overlap: 8,  pts: 60  },
-  paty:         { name: "Paty",         sprite: "paty",         h: 28, overlap: 8,  pts: 100 },
-  mayonesa:     { name: "Mayonesa",     sprite: "mayonesa",     h: 22, overlap: 10, pts: 60  },
-  pan_inferior: { name: "Pan Inferior", sprite: "pan_inferior", h: 32, overlap: 0,  pts: 100 },
+  pan_superior: { name: "Pan Superior", sprite: "pan_superior", h: 38, overlap: 10, pts: 100 },
+  cebolla:      { name: "Cebolla",      sprite: "cebolla",      h: 28, overlap: 12, pts: 80  },
+  bacon:        { name: "Bacon",        sprite: "bacon",        h: 28, overlap: 10, pts: 80  },
+  queso:        { name: "Queso",        sprite: "queso",        h: 24, overlap: 8,  pts: 60  },
+  paty:         { name: "Paty",         sprite: "paty",         h: 30, overlap: 8,  pts: 100 },
+  mayonesa:     { name: "Mayonesa",     sprite: "mayonesa",     h: 24, overlap: 10, pts: 60  },
+  pan_inferior: { name: "Pan Inferior", sprite: "pan_inferior", h: 34, overlap: 0,  pts: 100 },
 };
 
 class IngredientPiece {
@@ -485,7 +482,7 @@ class IngredientPiece {
     this.falling = false;
     this.fallSpeed = 0;
     this.targetFloorIndex = floorIndex;
-    this.landedOnPlate = (floorIndex === 7);
+    this.landedOnPlate = false;
 
     this.numSegments = 4;
     this.stepped = [false, false, false, false];
@@ -503,7 +500,6 @@ class IngredientPiece {
     const pCenter = playerRect.x + playerRect.w / 2;
     const floorY = this.level.floors[this.floorIndex].y;
 
-    // Detectar cuando el chef pasa caminando sobre el ingrediente
     if (
       Math.abs(pFeet - floorY) <= 12 &&
       playerRect.x + playerRect.w > this.x &&
@@ -521,7 +517,6 @@ class IngredientPiece {
         }
       }
 
-      // Al caminar por encima, cae automáticamente al piso de abajo
       const steppedCount = this.stepped.filter(Boolean).length;
       if (steppedCount >= 2 || this.stepped.every(Boolean)) {
         this.triggerFall(addScoreCallback);
@@ -532,15 +527,13 @@ class IngredientPiece {
   triggerFall(addScoreCallback) {
     if (this.falling || this.landedOnPlate) return;
 
-    if (this.floorIndex < this.level.floors.length - 1) {
-      this.falling = true;
-      this.fallSpeed = 3.8;
-      this.targetFloorIndex = this.floorIndex + 1;
-      this.stepped = [false, false, false, false];
-      this.stepOffsets = [0, 0, 0, 0];
-      SFX.burgerFall();
-      if (addScoreCallback) addScoreCallback(50);
-    }
+    this.falling = true;
+    this.fallSpeed = 3.8;
+    this.targetFloorIndex = this.floorIndex + 1;
+    this.stepped = [false, false, false, false];
+    this.stepOffsets = [0, 0, 0, 0];
+    SFX.burgerFall();
+    if (addScoreCallback) addScoreCallback(50);
   }
 
   update(allPieces, sausage, addScoreCallback) {
@@ -548,7 +541,7 @@ class IngredientPiece {
       this.fallSpeed = Math.min(this.fallSpeed + 0.45, 9.5);
       this.y += this.fallSpeed;
 
-      // 1. Aplastar salchicha al caer
+      // 1. Aplastar salchicha
       if (sausage && !sausage.stunned) {
         const sRect = sausage.getRect();
         const myRect = this.getRect();
@@ -563,7 +556,7 @@ class IngredientPiece {
         }
       }
 
-      // 2. Caída en cadena con ingredientes inferiores
+      // 2. Caída en cadena
       for (const other of allPieces) {
         if (other === this || other.startX !== this.startX) continue;
         if (other.floorIndex === this.targetFloorIndex && !other.falling && !other.landedOnPlate) {
@@ -573,12 +566,17 @@ class IngredientPiece {
         }
       }
 
-      // 3. Aterrizar en el piso inferior
-      const targetFloorY = this.level.floors[this.targetFloorIndex].y;
-      const landY = targetFloorY - this.h;
+      // 3. Aterrizaje
+      // Si el destino es después del último piso caminable (Piso 7), aterriza en el plato base
+      let targetY;
+      if (this.targetFloorIndex >= this.level.floors.length) {
+        targetY = this.level.plateY - this.h;
+      } else {
+        targetY = this.level.floors[this.targetFloorIndex].y - this.h;
+      }
 
-      if (this.y >= landY) {
-        this.y = landY;
+      if (this.y >= targetY) {
+        this.y = targetY;
         this.floorIndex = this.targetFloorIndex;
         this.falling = false;
         this.fallSpeed = 0;
@@ -586,7 +584,7 @@ class IngredientPiece {
         this.stepOffsets = [0, 0, 0, 0];
         SFX.burgerLand();
 
-        if (this.floorIndex === this.level.floors.length - 1) {
+        if (this.floorIndex >= this.level.floors.length) {
           this.landedOnPlate = true;
           if (addScoreCallback) addScoreCallback(this.config.pts);
         }
@@ -605,7 +603,6 @@ class IngredientPiece {
       ctx.fill();
     }
 
-    // Efecto visual de pisadas
     const segW = this.w / this.numSegments;
     for (let i = 0; i < this.numSegments; i++) {
       if (this.stepOffsets[i] > 0) {
@@ -636,7 +633,7 @@ class BurgerStack {
     this.level = levelStruct;
     this.pieces = [];
 
-    // Cada una de las 7 piezas empieza en su respectivo piso (0 a 6)
+    // Cada pieza empieza en su piso (Piso 0 a 6)
     for (let i = 0; i < ORDERED_LAYERS.length; i++) {
       const piece = new IngredientPiece(ORDERED_LAYERS[i], i, burgerX, levelStruct);
       this.pieces.push(piece);
@@ -655,7 +652,7 @@ class BurgerStack {
 
     // Auto-apilado perfecto en el plato base (Imagen 2)
     if (this.pieces[6].landedOnPlate) {
-      const baseY = this.level.floors[7].y - this.pieces[6].h;
+      const baseY = this.level.plateY - this.pieces[6].h;
       this.pieces[6].y = baseY;
 
       let currentTopY = baseY;
@@ -681,7 +678,7 @@ class BurgerStack {
 
 
 // =============================================================================
-// 8. JUGADOR (CON NAVEGACIÓN FLUIDA EN EL MAPA ARCADE)
+// 8. JUGADOR
 // =============================================================================
 class Player {
   constructor(gender = "hombre", levelStruct) {
@@ -713,7 +710,7 @@ class Player {
   }
 
   resetPosition() {
-    this.x = 40;
+    this.x = 35;
     this.y = this.level.floors[0].y - this.h;
     this.vy = 0;
     this.isClimbing = false;
@@ -749,7 +746,6 @@ class Player {
       const ladderCenterX = lad.x + lad.w / 2;
       this.x = ladderCenterX - this.w / 2;
 
-      // Subir
       if (input.up) {
         this.y -= this.climbSpeed;
         moved = true;
@@ -760,9 +756,7 @@ class Player {
           this.isClimbing = false;
           this.currentLadder = null;
         }
-      }
-      // Bajar
-      else if (input.down) {
+      } else if (input.down) {
         this.y += this.climbSpeed;
         moved = true;
         this.currentAction = "walk";
@@ -774,7 +768,6 @@ class Player {
         }
       }
 
-      // Salir lateralmente
       if (input.left) {
         this.x -= this.speed;
         this.facing = -1;
@@ -791,8 +784,7 @@ class Player {
 
       this.vy = 0;
     } else {
-      // 2. Sobre Plataformas
-      // Bajar Escalera
+      // 2. Sobre Plataforma
       if (input.down) {
         const ladderBelow = this.level.findLadderBelow(cx, feetY, 20);
         if (ladderBelow) {
@@ -805,7 +797,6 @@ class Player {
         }
       }
 
-      // Subir Escalera
       if (input.up && !this.isClimbing) {
         const ladderNear = this.level.findLadderAt(cx, centerY, 20);
         if (ladderNear) {
@@ -818,7 +809,6 @@ class Player {
         }
       }
 
-      // Movimiento Horizontal
       if (!this.isClimbing) {
         if (input.left) {
           this.x -= this.speed;
@@ -832,11 +822,9 @@ class Player {
           this.currentAction = "walk";
         }
 
-        // Gravedad suave
         this.vy = Math.min(this.vy + 0.45, 9.0);
         this.y += this.vy;
 
-        // Colisión con las plataformas del mapa
         const platY = this.level.isPointOnPlatform(cx, this.y + this.h);
         if (platY !== null && this.vy > 0 && this.y + this.h - this.vy <= platY + 10) {
           this.y = platY - this.h;
@@ -849,8 +837,8 @@ class Player {
       this.currentAction = "idle";
     }
 
-    this.x = Math.max(30, Math.min(this.x, CANVAS_W - 30 - this.w));
-    if (this.y < 50) this.y = 50;
+    this.x = Math.max(20, Math.min(this.x, CANVAS_W - 20 - this.w));
+    if (this.y < 45) this.y = 45;
   }
 
   takeHit() {
@@ -925,7 +913,7 @@ class Player {
 
 
 // =============================================================================
-// 9. ENEMIGO: SALCHICHA (IA MEJORADA)
+// 9. ENEMIGO: SALCHICHA
 // =============================================================================
 class SausageEnemy {
   constructor(levelStruct) {
@@ -948,7 +936,7 @@ class SausageEnemy {
   }
 
   resetPosition() {
-    this.x = 710;
+    this.x = 730;
     this.y = this.level.floors[0].y - this.h;
     this.vy = 0;
     this.stunned = false;
@@ -1033,7 +1021,7 @@ class SausageEnemy {
       }
     }
 
-    this.x = Math.max(30, Math.min(this.x, CANVAS_W - 30 - this.w));
+    this.x = Math.max(20, Math.min(this.x, CANVAS_W - 20 - this.w));
 
     this.animTick++;
     if (this.animTick >= 8) {
@@ -1288,17 +1276,13 @@ class GameEngine {
       return;
     }
 
-    // Dibujar Estructura Arcade
     this.level.draw(this.ctx);
 
-    // Dibujar Hamburguesas
     for (const b of this.burgers) b.draw(this.ctx);
 
-    // Dibujar Personajes
     this.sausage.draw(this.ctx);
     this.player.draw(this.ctx);
 
-    // HUD Arcade Auténtico
     this.drawHUD();
 
     if (this.state === "WON" || this.state === "LOST") {
@@ -1310,42 +1294,40 @@ class GameEngine {
     this.ctx.font = "14px 'Press Start 2P', monospace";
     this.ctx.textBaseline = "top";
 
-    // 1UP y SCORE (Rojo y Blanco)
+    // 1UP y SCORE
     this.ctx.fillStyle = C_TEXT_RED;
-    this.ctx.fillText("1UP", 50, 18);
+    this.ctx.fillText("1UP", 50, 16);
     this.ctx.fillStyle = C_TEXT_WHITE;
-    this.ctx.fillText(String(this.score).padStart(6, " "), 50, 38);
+    this.ctx.fillText(String(this.score).padStart(6, " "), 50, 36);
 
-    // HI-SCORE (Rojo y Blanco)
+    // HI-SCORE
     this.ctx.fillStyle = C_TEXT_RED;
-    this.ctx.fillText("HI-SCORE", 310, 18);
+    this.ctx.fillText("HI-SCORE", 310, 16);
     this.ctx.fillStyle = C_TEXT_WHITE;
-    this.ctx.fillText(String(this.hiScore).padStart(6, " "), 330, 38);
+    this.ctx.fillText(String(this.hiScore).padStart(6, " "), 330, 36);
 
-    // PEPPER / SAL (Verde y Blanco)
+    // PEPPER / SAL
     this.ctx.fillStyle = C_TEXT_GREEN;
-    this.ctx.fillText("PEPPER", 620, 18);
+    this.ctx.fillText("PEPPER", 620, 16);
     this.ctx.fillStyle = C_TEXT_WHITE;
-    this.ctx.fillText(String(this.player.saltCount).padStart(5, " "), 640, 38);
+    this.ctx.fillText(String(this.player.saltCount).padStart(5, " "), 640, 36);
 
     // Barra de Estado Inferior
-    const botY = CANVAS_H - 30;
+    const botY = CANVAS_H - 24;
 
-    // Vidas (Iconos de Chef)
     this.ctx.fillStyle = C_TEXT_YELLOW;
     this.ctx.font = "10px 'Press Start 2P', monospace";
-    this.ctx.fillText("LIVES:", 40, botY + 5);
+    this.ctx.fillText("LIVES:", 40, botY + 2);
     for (let i = 0; i < this.player.lives; i++) {
       this.ctx.fillStyle = C_TEXT_RED;
       this.ctx.beginPath();
-      this.ctx.arc(120 + i * 18, botY + 10, 6, 0, Math.PI * 2);
+      this.ctx.arc(120 + i * 18, botY + 7, 5, 0, Math.PI * 2);
       this.ctx.fill();
     }
 
-    // Progreso Hamburguesas
     const completed = this.burgers.filter((b) => b.isComplete()).length;
     this.ctx.fillStyle = C_TEXT_GREEN;
-    this.ctx.fillText(`BURGERS: ${completed}/2`, 600, botY + 5);
+    this.ctx.fillText(`BURGERS: ${completed}/2`, 600, botY + 2);
   }
 
   drawSelectScreen() {
@@ -1364,7 +1346,6 @@ class GameEngine {
     this.ctx.fillStyle = C_TEXT_WHITE;
     this.ctx.fillText("SELECCIONA TU CHEF", cx, 160);
 
-    // Tarjeta Hombre
     const isH = this.selectedGender === "hombre";
     this.ctx.fillStyle = isH ? "#003b52" : "#11111e";
     this.ctx.strokeStyle = isH ? C_PLATFORM_CYAN : "#005577";
@@ -1381,7 +1362,6 @@ class GameEngine {
     this.ctx.fillStyle = isH ? C_TEXT_YELLOW : C_TEXT_GRAY;
     this.ctx.fillText("HOMBRE [1]", cx - 120, cy + 110);
 
-    // Tarjeta Mujer
     const isM = this.selectedGender === "mujer";
     this.ctx.fillStyle = isM ? "#003b52" : "#11111e";
     this.ctx.strokeStyle = isM ? C_PLATFORM_CYAN : "#005577";
@@ -1399,7 +1379,7 @@ class GameEngine {
 
     this.ctx.fillStyle = C_PLATFORM_CYAN;
     this.ctx.font = "11px 'Press Start 2P', monospace";
-    this.ctx.fillText("Haz Clic o Presiona [ENTER] para Comenzar", cx, CANVAS_H - 70);
+    this.ctx.fillText("Haz Clic o Presiona [ENTER] para Comenzar", cx, CANVAS_H - 80);
   }
 
   drawResultScreen() {

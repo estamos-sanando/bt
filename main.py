@@ -1,6 +1,6 @@
 """
 BurgerTime Arcade 2D Game (Python / Pygame)
-Estructura de mapa fiel al BurgerTime clásico de Arcade adaptada para 2 hamburguesas completas de 7 capas.
+Hamburguesas enmarcadas entre escaleras y platos ubicados en la base inferior.
 """
 
 import pygame
@@ -12,10 +12,9 @@ import math
 # CONFIGURACIÓN Y CONSTANTES GLOBALES
 # ==============================================================================
 SCREEN_W = 800
-SCREEN_H = 720
+SCREEN_H = 760
 FPS = 60
 
-# Paleta Retro Arcade Auténtica
 C_BG = (0, 0, 0)
 C_PLATFORM_CYAN = (0, 240, 255)
 C_PLATFORM_DARK = (0, 59, 82)
@@ -96,44 +95,44 @@ class ResourceManager:
 
 
 # ==============================================================================
-# ESTRUCTURA DE NIVELES (ESTRUCTURA BURGERTIME ARCADE)
+# ESTRUCTURA DE NIVELES (BURGERTIME RETRO)
 # ==============================================================================
-FLOOR_Y_COORDS = [105, 180, 255, 330, 405, 480, 555, 630]
+FLOOR_Y_COORDS = [95, 165, 235, 305, 375, 445, 515, 585]
 
 PLATFORMS_DATA = [
     # Piso 0
-    (0, 30, 770),
+    (0, 20, 780),
     # Piso 1
-    (1, 30, 320), (1, 350, 450), (1, 480, 770),
+    (1, 20, 320), (1, 360, 440), (1, 480, 780),
     # Piso 2
-    (2, 30, 240), (2, 270, 530), (2, 560, 770),
+    (2, 20, 230), (2, 270, 530), (2, 570, 780),
     # Piso 3
-    (3, 30, 320), (3, 350, 450), (3, 480, 770),
+    (3, 20, 320), (3, 360, 440), (3, 480, 780),
     # Piso 4
-    (4, 30, 240), (4, 270, 530), (4, 560, 770),
+    (4, 20, 230), (4, 270, 530), (4, 570, 780),
     # Piso 5
-    (5, 30, 320), (5, 350, 450), (5, 480, 770),
+    (5, 20, 320), (5, 360, 440), (5, 480, 780),
     # Piso 6
-    (6, 30, 770),
-    # Piso 7 (Base)
-    (7, 30, 770),
+    (6, 20, 780),
+    # Piso 7 (Base caminable)
+    (7, 20, 780),
 ]
 
 LADDERS_DATA = [
     # Piso 0 a 1
-    (50,  105, 180, 26), (300, 105, 180, 26), (390, 105, 180, 26), (490, 105, 180, 26), (730, 105, 180, 26),
+    (24,  95, 165, 26), (76,  95, 165, 26), (268, 95, 165, 26), (387, 95, 165, 26), (506, 95, 165, 26), (698, 95, 165, 26), (750, 95, 165, 26),
     # Piso 1 a 2
-    (100, 180, 255, 26), (210, 180, 255, 26), (390, 180, 255, 26), (590, 180, 255, 26), (690, 180, 255, 26),
+    (76,  165, 235, 26), (268, 165, 235, 26), (387, 165, 235, 26), (506, 165, 235, 26), (698, 165, 235, 26),
     # Piso 2 a 3
-    (50,  255, 330, 26), (300, 255, 330, 26), (390, 255, 330, 26), (490, 255, 330, 26), (730, 255, 330, 26),
+    (24,  235, 305, 26), (76,  235, 305, 26), (268, 235, 305, 26), (387, 235, 305, 26), (506, 235, 305, 26), (698, 235, 305, 26), (750, 235, 305, 26),
     # Piso 3 a 4
-    (100, 330, 405, 26), (210, 330, 405, 26), (390, 330, 405, 26), (590, 330, 405, 26), (690, 330, 405, 26),
+    (76,  305, 375, 26), (268, 305, 375, 26), (387, 305, 375, 26), (506, 305, 375, 26), (698, 305, 375, 26),
     # Piso 4 a 5
-    (50,  405, 480, 26), (300, 405, 480, 26), (390, 405, 480, 26), (490, 405, 480, 26), (730, 405, 480, 26),
+    (24,  375, 445, 26), (76,  375, 445, 26), (268, 375, 445, 26), (387, 375, 445, 26), (506, 375, 445, 26), (698, 375, 445, 26), (750, 375, 445, 26),
     # Piso 5 a 6
-    (100, 480, 555, 26), (210, 480, 555, 26), (390, 480, 555, 26), (590, 480, 555, 26), (690, 480, 555, 26),
+    (76,  445, 515, 26), (268, 445, 515, 26), (387, 445, 515, 26), (506, 445, 515, 26), (698, 445, 515, 26),
     # Piso 6 a 7
-    (50,  555, 630, 26), (300, 555, 630, 26), (390, 555, 630, 26), (490, 555, 630, 26), (730, 555, 630, 26),
+    (24,  515, 585, 26), (76,  515, 585, 26), (268, 515, 585, 26), (387, 515, 585, 26), (506, 515, 585, 26), (698, 515, 585, 26), (750, 515, 585, 26),
 ]
 
 
@@ -160,9 +159,10 @@ class LevelStructure:
         self.floors_y = FLOOR_Y_COORDS
         self.platforms = PLATFORMS_DATA
         self.ladders = [Ladder(x, top, btm, w) for (x, top, btm, w) in LADDERS_DATA]
-        self.burger1_x = 140
-        self.burger2_x = 520
-        self.burger_width = 140
+        self.plate_y = 700
+        self.burger1_x = 110
+        self.burger2_x = 540
+        self.burger_width = 150
 
     def find_ladder_at(self, cx, cy, range_x=20):
         for lad in self.ladders:
@@ -186,7 +186,6 @@ class LevelStructure:
     def draw(self, surface):
         surface.fill(C_BG)
 
-        # 1. Escaleras (Peldaños grises densos con rieles cyan)
         for lad in self.ladders:
             lx, top, btm, lw = lad.x, lad.top_y, lad.bottom_y, lad.w
             pygame.draw.rect(surface, C_LADDER_RAIL, (lx, top, 3, btm - top))
@@ -194,7 +193,6 @@ class LevelStructure:
             for ry in range(top + 4, btm, 6):
                 pygame.draw.rect(surface, C_LADDER_RUNG, (lx + 2, ry, lw - 4, 2))
 
-        # 2. Vigas / Plataformas Cyan Brillante
         for (f_idx, x1, x2) in self.platforms:
             fy = self.floors_y[f_idx]
             pw = x2 - x1
@@ -204,13 +202,11 @@ class LevelStructure:
             for rx in range(x1 + 8, x2, 16):
                 pygame.draw.rect(surface, C_PLATFORM_CYAN, (rx, fy + 2, 2, 2))
 
-        # 3. Platos de Servido (Y=630)
-        plate_y = 630 + 4
         for bx in [self.burger1_x, self.burger2_x]:
-            pw = self.burger_width
-            px = bx - 10
-            pygame.draw.ellipse(surface, (255, 255, 255), (px - 6, plate_y, pw + 12, 12))
-            pygame.draw.ellipse(surface, C_PLATFORM_CYAN, (px - 6, plate_y, pw + 12, 12), 2)
+            pw = self.burger_width + 16
+            px = bx - 8
+            pygame.draw.ellipse(surface, (255, 255, 255), (px, self.plate_y, pw, 12))
+            pygame.draw.ellipse(surface, C_PLATFORM_CYAN, (px, self.plate_y, pw, 12), 2)
 
 
 # ==============================================================================
@@ -240,13 +236,13 @@ class SaltCloud(pygame.sprite.Sprite):
 # PIEZAS DE HAMBURGUESA (7 CAPAS)
 # ==============================================================================
 LAYER_INFO = {
-  "pan_superior": {"sprite": ["arribapan.png", "pan_superior.png"], "h": 36, "overlap": 10, "pts": 100},
-  "cebolla":      {"sprite": ["cebolla.png"],                       "h": 26, "overlap": 12, "pts": 80 },
-  "bacon":        {"sprite": ["bacon.png"],                         "h": 26, "overlap": 10, "pts": 80 },
-  "queso":        {"sprite": ["queso.png"],                         "h": 22, "overlap": 8,  "pts": 60 },
-  "paty":         {"sprite": ["paty.png", "carne.png"],             "h": 28, "overlap": 8,  "pts": 100},
-  "mayonesa":     {"sprite": ["mayonesa.png"],                      "h": 22, "overlap": 10, "pts": 60 },
-  "pan_inferior": {"sprite": ["abajopan.png", "pan_inferior.png"], "h": 32, "overlap": 0,  "pts": 100},
+  "pan_superior": {"sprite": ["arribapan.png", "pan_superior.png"], "h": 38, "overlap": 10, "pts": 100},
+  "cebolla":      {"sprite": ["cebolla.png"],                       "h": 28, "overlap": 12, "pts": 80 },
+  "bacon":        {"sprite": ["bacon.png"],                         "h": 28, "overlap": 10, "pts": 80 },
+  "queso":        {"sprite": ["queso.png"],                         "h": 24, "overlap": 8,  "pts": 60 },
+  "paty":         {"sprite": ["paty.png", "carne.png"],             "h": 30, "overlap": 8,  "pts": 100},
+  "mayonesa":     {"sprite": ["mayonesa.png"],                      "h": 24, "overlap": 10, "pts": 60 },
+  "pan_inferior": {"sprite": ["abajopan.png", "pan_inferior.png"], "h": 34, "overlap": 0,  "pts": 100},
 }
 
 ORDERED_KEYS = [
@@ -276,7 +272,7 @@ class IngredientPiece:
         self.falling = False
         self.fall_speed = 0.0
         self.target_floor_idx = floor_idx
-        self.landed_on_plate = (floor_idx == 7)
+        self.landed_on_plate = False
 
         self.num_segments = 4
         self.stepped = [False] * 4
@@ -313,13 +309,12 @@ class IngredientPiece:
         if self.falling or self.landed_on_plate:
             return
 
-        if self.floor_idx < len(self.level.floors_y) - 1:
-            self.falling = True
-            self.fall_speed = 3.8
-            self.target_floor_idx = self.floor_idx + 1
-            self.stepped = [False] * 4
-            self.step_offsets = [0.0] * 4
-            if add_score_cb: add_score_cb(50)
+        self.falling = True
+        self.fall_speed = 3.8
+        self.target_floor_idx = self.floor_idx + 1
+        self.stepped = [False] * 4
+        self.step_offsets = [0.0] * 4
+        if add_score_cb: add_score_cb(50)
 
     def update(self, all_pieces, sausage, add_score_cb):
         if self.falling:
@@ -331,7 +326,6 @@ class IngredientPiece:
                     sausage.stun(FPS * 5)
                     if add_score_cb: add_score_cb(500)
 
-            # Caída en cadena
             for other in all_pieces:
                 if other is self or other.start_x != self.start_x:
                     continue
@@ -339,7 +333,11 @@ class IngredientPiece:
                     if self.y + self.h >= other.y:
                         other.trigger_fall(add_score_cb)
 
-            target_y = self.level.floors_y[self.target_floor_idx] - self.h
+            if self.target_floor_idx >= len(self.level.floors_y):
+                target_y = self.level.plate_y - self.h
+            else:
+                target_y = self.level.floors_y[self.target_floor_idx] - self.h
+
             if self.y >= target_y:
                 self.y = float(target_y)
                 self.floor_idx = self.target_floor_idx
@@ -348,7 +346,7 @@ class IngredientPiece:
                 self.stepped = [False] * 4
                 self.step_offsets = [0.0] * 4
 
-                if self.floor_idx == len(self.level.floors_y) - 1:
+                if self.floor_idx >= len(self.level.floors_y):
                     self.landed_on_plate = True
                     if add_score_cb: add_score_cb(self.info["pts"])
 
@@ -380,9 +378,8 @@ class BurgerStack:
             p.check_player_step(player_rect, add_score_cb)
             p.update(all_pieces, sausage, add_score_cb)
 
-        # Apilado perfecto en la base
         if self.pieces[6].landed_on_plate:
-            base_y = float(self.level.floors_y[7] - self.pieces[6].h)
+            base_y = float(self.level.plate_y - self.pieces[6].h)
             self.pieces[6].y = base_y
             curr_top = base_y
 
@@ -440,7 +437,7 @@ class Player:
         self.salt_frame = ResourceManager.load_image([f"{g}sal.png", f"jugador_{g}.png"], size=size)
 
     def reset_position(self):
-        self.x = 40.0
+        self.x = 35.0
         self.y = float(self.level.floors_y[0] - self.h)
         self.vy = 0.0
         self.is_climbing = False
@@ -544,9 +541,9 @@ class Player:
         if not moved and self.current_action != "salt":
             self.current_action = "idle"
 
-        self.x = max(30.0, min(self.x, float(SCREEN_W - 30 - self.w)))
-        if self.y < 50:
-            self.y = 50.0
+        self.x = max(20.0, min(self.x, float(SCREEN_W - 20 - self.w)))
+        if self.y < 45:
+            self.y = 45.0
 
     def take_hit(self):
         if not self.stunned:
@@ -625,7 +622,7 @@ class SausageEnemy:
         self.stun_frame = ResourceManager.load_image(["salchichafrente.png", "salchicha.png"], size=size)
 
     def reset_position(self):
-        self.x = 710.0
+        self.x = 730.0
         self.y = float(self.level.floors_y[0] - self.h)
         self.vy = 0.0
         self.stunned = False
@@ -662,7 +659,7 @@ class SausageEnemy:
             self.x = lad.x + lad.w / 2 - self.w / 2
             if dy < -8:
                 self.y -= self.climb_speed
-                if self.y + self.h <= lad.top_y + 4:
+                if self.y + self.h <= lad.topY + 4:
                     self.y = float(lad.top_y - self.h)
                     self.is_climbing = False
             elif dy > 8:
@@ -696,7 +693,7 @@ class SausageEnemy:
                     self.y = float(plat_y - self.h)
                     self.vy = 0.0
 
-        self.x = max(30.0, min(self.x, float(SCREEN_W - 30 - self.w)))
+        self.x = max(20.0, min(self.x, float(SCREEN_W - 20 - self.w)))
 
         self.anim_tick += 1
         if self.anim_tick >= 8:
@@ -721,26 +718,22 @@ class SausageEnemy:
 # ==============================================================================
 class HUD:
     def draw(self, surface, player, burgers, score, hi_score):
-        # 1UP & SCORE
         txt_1up = FONT_HUD.render("1UP", True, C_TEXT_RED)
         txt_score = FONT_HUD.render(str(score).rjust(6), True, C_TEXT_WHITE)
-        surface.blit(txt_1up, (50, 15))
-        surface.blit(txt_score, (50, 35))
+        surface.blit(txt_1up, (50, 14))
+        surface.blit(txt_score, (50, 34))
 
-        # HI-SCORE
         txt_hi = FONT_HUD.render("HI-SCORE", True, C_TEXT_RED)
         txt_hiscore = FONT_HUD.render(str(hi_score).rjust(6), True, C_TEXT_WHITE)
-        surface.blit(txt_hi, (320, 15))
-        surface.blit(txt_hiscore, (335, 35))
+        surface.blit(txt_hi, (320, 14))
+        surface.blit(txt_hiscore, (335, 34))
 
-        # PEPPER / SAL
         txt_pep = FONT_HUD.render("PEPPER", True, C_TEXT_GREEN)
         txt_pepval = FONT_HUD.render(str(player.salt_count).rjust(5), True, C_TEXT_WHITE)
-        surface.blit(txt_pep, (620, 15))
-        surface.blit(txt_pepval, (640, 35))
+        surface.blit(txt_pep, (620, 14))
+        surface.blit(txt_pepval, (640, 34))
 
-        # Barra inferior
-        bot_y = SCREEN_H - 30
+        bot_y = SCREEN_H - 24
         txt_lives = FONT_HUD.render("LIVES:", True, C_TEXT_YELLOW)
         surface.blit(txt_lives, (40, bot_y))
         for i in range(player.lives):
@@ -817,13 +810,13 @@ class CharacterSelectScreen:
 
             is_active_m = (selected == "mujer") or hover_m
             pygame.draw.rect(self.screen, C_PLATFORM_DARK if is_active_m else (17, 17, 30), btn_m, border_radius=12)
-            pygame.draw.rect(self.screen, C_PLATFORM_CYAN if is_active_m else (0, 85, 119), btn_m, 3 if is_active_m else 2, border_radius=12)
+            pygame.draw.rect(self.screen, C_PLATFORM_CYAN if is_active_m else (0, 85, 119), btn_m, 3 if is_active_h else 2, border_radius=12)
             self.screen.blit(self.img_m, (btn_m.centerx - 45, btn_m.y + 20))
             lbl_m = FONT_SUBTITLE.render("MUJER [2]", True, C_TEXT_YELLOW if is_active_m else C_TEXT_GRAY)
             self.screen.blit(lbl_m, lbl_m.get_rect(center=(btn_m.centerx, btn_m.bottom - 28)))
 
             inst = FONT_HUD.render("Presiona [ENTER] o Haz Clic para Jugar", True, C_PLATFORM_CYAN)
-            self.screen.blit(inst, inst.get_rect(center=(cx, SCREEN_H - 60)))
+            self.screen.blit(inst, inst.get_rect(center=(cx, SCREEN_H - 80)))
 
             pygame.display.flip()
 
